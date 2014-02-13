@@ -10,6 +10,8 @@ Special thanks to @devbridge for autocomplete script.
 
 https://github.com/devbridge/jQuery-Autocomplete
 
+<img src="http://simplethemes.s3.amazonaws.com/fontawesome_ss.png">
+
 
 
 ### TODO
