@@ -441,13 +441,23 @@ var $fonts = array(
         $theicons = json_encode($fontawesome);
 
         $this->EE->javascript->output("
-            $('#".$this->field_name."').autocomplete({
-                width: '400',
-                formatResult : function (suggestion, currentValue) {
-                    return '<i class=\"fa fa-'+suggestion.value+'\">&nbsp;<strong>'+suggestion.value+'</strong><\/i>'
-                },
-                lookup: ".$theicons."
-            });
+            FAAutocomplete();
+
+            if (typeof(window.Grid) !== 'undefined') {
+                Grid.bind('fontawesome','display', function(cell) {
+                    FAAutocomplete();
+                });
+            }
+
+            function FAAutocomplete() {
+                $('.fa-autocomplete').autocomplete({
+                    width: '400',
+                    formatResult : function (suggestion, currentValue) {
+                        return '<i class=\"fa fa-'+suggestion.value+'\">&nbsp;<strong>'+suggestion.value+'</strong><\/i>'
+                    },
+                    lookup: ".$theicons."
+                });
+            }
         ");
         $this->EE->cp->add_to_head('
             <style type="text/css">
@@ -471,10 +481,10 @@ var $fonts = array(
                cursor:pointer;
             }
             </style>');
-        $form = form_input($this->field_name, $data, 'id="'.$this->field_name.'"'.'placeholder="type something awesome..."');
+
+        $form = form_input($this->field_name, $data, 'id="'.$this->field_name.'" class="fa-autocomplete"'.'placeholder="type something awesome..."');
         return $form;
     }
-
 
 
 
@@ -507,6 +517,13 @@ var $fonts = array(
         return array(
             'fonts'  => ''
         );
+    }
+
+    // --------------------------------------------------------------------
+
+    function accepts_content_type($name)
+    {
+        return ($name == 'channel' || $name == 'grid');
     }
 
 }
