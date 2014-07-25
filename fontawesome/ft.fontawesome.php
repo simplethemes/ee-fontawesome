@@ -4,7 +4,7 @@ class FontAwesome_ft extends EE_Fieldtype {
 
     var $info = array(
         'name'      => 'Font Awesome',
-        'version'   => '1.0'
+        'version'   => '1.1'
     );
 
 var $fonts = array(
@@ -432,57 +432,89 @@ var $fonts = array(
      */
     function display_field($data)
     {
-        $this->EE->cp->add_to_head('<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">');
-        $this->EE->cp->load_package_js('jquery.autocomplete.min');
-
         foreach($this->fonts as $val) {
              $fontawesome[] = array('value' => $val);
         }
         $theicons = json_encode($fontawesome);
 
-        $this->EE->javascript->output("
-            FAAutocomplete();
+        $css_inject = <<<EOD
+<style type="text/css">
+    .autocomplete-suggestions {
+        max-height:200px;
+        border:1px solid #C5CED4;
+        border-top:none;
+        overflow:auto;
+    }
+    .autocomplete-suggestion {
+        line-height:24px;
+        font-size:16px;
+        padding:4px 0 4px 12px;
+        background-color:#ECF1F4;
+        color:#3E4C54;
+        border-bottom:1px solid #C5CED4;
+    }
+    .autocomplete-suggestion.autocomplete-selected {
+       color:#000;
+       background-color:#fff;
+       cursor:pointer;
+    }
+    .autocomplete-fa-input {
+        padding-left:26px !important;
+    }
+    .autocomplete-fa-preview {
+        position:relative;
+        top:-21px;
+        left:4px;
 
-            if (typeof(window.Grid) !== 'undefined') {
-                Grid.bind('fontawesome','display', function(cell) {
-                    FAAutocomplete();
-                });
-            }
+        display:block;
+        width:20px;
+        height:20px;
+        line-height:16px;
 
-            function FAAutocomplete() {
-                $('.fa-autocomplete').autocomplete({
-                    width: '400',
-                    formatResult : function (suggestion, currentValue) {
-                        return '<i class=\"fa fa-'+suggestion.value+'\">&nbsp;<strong>'+suggestion.value+'</strong><\/i>'
-                    },
-                    lookup: ".$theicons."
-                });
-            }
-        ");
-        $this->EE->cp->add_to_head('
-            <style type="text/css">
-            .autocomplete-suggestions {
-                max-height:200px;
-                border:1px solid #C5CED4;
-                border-top:none;
-                overflow:auto;
-            }
-            .autocomplete-suggestion {
-                line-height:24px;
-                font-size:16px;
-                padding:4px 0 4px 12px;
-                background-color:#ECF1F4;
-                color:#3E4C54;
-                border-bottom:1px solid #C5CED4;
-            }
-            .autocomplete-suggestion.autocomplete-selected {
-               color:#000;
-               background-color:#fff;
-               cursor:pointer;
-            }
-            </style>');
+        color:rgb(95, 108, 116);
+        color:rgba(95, 108, 116, 0.5);
+        font-size:16px;
+        text-align:center;
+    }
+</style>
+EOD;
 
-        $form = form_input($this->field_name, $data, 'id="'.$this->field_name.'" class="fa-autocomplete"'.'placeholder="type something awesome..."');
+        $js_inject = <<<EOD
+<script>
+FAAutocomplete();
+
+if (typeof(window.Grid) !== 'undefined') {
+    Grid.bind('fontawesome','display', function(cell) {
+        FAAutocomplete();
+    });
+}
+
+function FAAutocomplete() {
+    \$('.autocomplete-fa-input').autocomplete({
+        formatResult: function (suggestion, currentValue) {
+                          return '<i class="fa fa-'+suggestion.value+'">&nbsp;<strong>'+suggestion.value+'</strong><\/i>'
+                      },
+        lookup:       {$theicons},
+        minChars:     0,
+        onSelect:     function (s) { \$('~ i',this).attr('class','fa fa-' + s.value + ' autocomplete-fa-preview'); },
+        width:        '400'
+    });
+}
+</script>
+EOD;
+
+        if ( ! defined('FAFT_INITIALIZED') )
+        {
+            define('FAFT_INITIALIZED',TRUE);
+            $this->EE->cp->add_to_head('<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">');
+            $this->EE->cp->add_to_head($css_inject);
+            $this->EE->cp->load_package_js('jquery.autocomplete.min');
+            $this->EE->cp->add_to_foot($js_inject);
+        }
+
+        $form = form_input($this->field_name, $data, 'id="'.$this->field_name.'" class="autocomplete-fa-input"'.'placeholder="Enter an icon name..."');
+        $icon_class = ( $data != '' )? 'fa-' . $data: '';
+        $form .= '<i class="fa ' . $icon_class . ' autocomplete-fa-preview"></i>';
         return $form;
     }
 
