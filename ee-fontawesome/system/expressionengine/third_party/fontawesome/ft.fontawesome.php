@@ -691,7 +691,14 @@ EOD;
 
     function accepts_content_type($name)
     {
-        return ($name == 'channel' || $name == 'grid');
+        switch ($name) {
+            case 'channel':
+            case 'grid':
+            case 'blocks/1':
+                return true;
+            default:
+                return false;
+        }
     }
 
 }
