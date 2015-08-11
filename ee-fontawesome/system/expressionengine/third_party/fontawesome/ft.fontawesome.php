@@ -649,7 +649,7 @@ EOD;
     {
         define('FAFT_INITIALIZED',TRUE);
         $this->EE->cp->add_to_head('<link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">');
-        $this->EE->cp->add_to_foot('<script type="text/javascript" src="'.$this->EE->config->slash_item('theme_folder_url').'third_party/fontawesome/jquery.autocomplete.min.js'.'"></script>');
+        $this->EE->cp->add_to_foot('<script type="text/javascript" src="'.$this->EE->config->slash_item('url_third_themes').'fontawesome/jquery.autocomplete.min.js'.'"></script>');
         $this->EE->cp->add_to_head($css_inject);
         $this->EE->cp->add_to_foot($js_inject);
     }
